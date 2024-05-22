@@ -1,14 +1,25 @@
-interface ProductCardProps {
-    id: string;
-    name: string;
-    price: number;
-    picture: string;
-  }
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import { ItemState } from '@/redux/store'
 
-const ProductCard = ({id, name, price, picture} : ProductCardProps) => {
-    return (
-        <div className="bg-gray-200 p-6 rounded-md">
-      <div className="relative 100% h-40 m-auto">
+interface ProductCardProps {
+  id: string;
+  name: string;
+  price: number;
+  picture: string;
+}
+
+export const useGlobalItems = () => {
+  return useSelector((state : ItemState) => state, shallowEqual)
+}
+
+const ProductCard = ({ id, name, price, picture }: ProductCardProps) => {
+  const dispatch = useDispatch();
+  const items = useGlobalItems();
+  const productAmount = items?.[id] ?? 0;
+
+  return (
+    <div className="bg-gray-200 p-6 rounded-md">
+      <div className="relative 100% m-auto">
         <img src={picture} alt={name} className="object-cover" />
       </div>
       <div className="flex justify-between mt-4">
@@ -18,19 +29,19 @@ const ProductCard = ({id, name, price, picture} : ProductCardProps) => {
       <div className="flex justify-between mt-4 w-2/4 m-auto">
         <button
           className="pl-2 pr-2 bg-red-400 text-white rounded-md"
-          disabled={false /* To be implemented */}
-          onClick={() => {} /* To be implemented */}>
+          disabled={productAmount === 0}
+          onClick={() => dispatch({ type: 'DECREMENT', id})}>
           -
         </button>
-        <div>{/* To be implemented */}</div>
+        <div>{productAmount}</div>
         <button
           className="pl-2 pr-2 bg-green-400 text-white rounded-md"
-          onClick={() => {} /* To be implemented */}>
+          onClick={() => dispatch({ type: 'INCREMENT', id})}>
           +
         </button>
       </div>
     </div>
-    );
+  );
 }
 
 export default ProductCard;
